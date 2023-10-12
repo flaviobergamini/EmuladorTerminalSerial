@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO.Ports;
 
 namespace TesteSerial
@@ -5,8 +6,8 @@ namespace TesteSerial
     public partial class TerminalBurrro : Form
     {
         static SerialPort _serialPort = new SerialPort();
-        string RxString;
-        bool _continue;
+        private bool OperationSystem = false;
+        Process processoCmd = new Process();
 
         public TerminalBurrro()
         {
@@ -68,6 +69,16 @@ namespace TesteSerial
             }
 
             this.cboHandshake.SelectedIndex = 1;
+
+            // Configure as propriedades do processo
+            processoCmd.StartInfo.FileName = "cmd.exe"; // Executar o CMD
+            processoCmd.StartInfo.RedirectStandardInput = true; // Redirecionar entrada padrão
+            processoCmd.StartInfo.RedirectStandardOutput = true; // Redirecionar saída padrão
+            processoCmd.StartInfo.UseShellExecute = false; // Não use o shell para iniciar o processo
+            processoCmd.StartInfo.CreateNoWindow = true; // Não crie uma janela do CMD
+
+            // Iniciar o processo
+            processoCmd.Start();
 
         }
 
@@ -155,31 +166,68 @@ namespace TesteSerial
 
         public void Read()
         {
+            string receive; 
+
             while (true)
             {
                 try
                 {
-                    string receive = _serialPort.ReadExisting();
-
-                    if (receive != "" && receive != null)
+                    if (OperationSystem == true)
                     {
-                        _serialPort.Write($"{receive}");
-                        this.txtRecebe.Text += $"{receive}";
+                        processoCmd.Start();
 
-                        if (receive.Contains("\r"))
+                        _serialPort.Write("C > ");
+
+                        receive = _serialPort.ReadExisting();
+
+                        if (receive != "" && receive != null)
                         {
-                            _serialPort.WriteLine("");
-                            this.txtRecebe.Text += "\n";
+                            processoCmd.StandardInput.WriteLine(receive);
+                            processoCmd.StandardInput.Flush();
+                            processoCmd.StandardInput.Close();
+                            processoCmd.WaitForExit();
+
+                            var saida = processoCmd.StandardOutput.ReadToEnd();
+
+                            _serialPort.WriteLine(saida);
+                            processoCmd.Close();
+                            /*Console.Write("C > ");
+                            cmd = Console.ReadLine();
+                            if (cmd == "cls")
+                                Console.Clear();
+                            if (cmd == "exit")
+                                break; */
                         }
+                    }
+                    else
+                    {
+                        receive = _serialPort.ReadExisting();
 
-                        if (receive.Contains("\b"))
+                        if (receive != "" && receive != null)
                         {
-                            this.txtRecebe.Text += "\b";
+                            _serialPort.Write($"{receive}");
+                            this.txtRecebe.Text += $"{receive}";
+
+                            if (receive.Contains("\r"))
+                            {
+                                _serialPort.WriteLine("");
+                                this.txtRecebe.Text += "\n";
+                            }
+
+                            if (receive.Contains("\b"))
+                            {
+                                this.txtRecebe.Text += "\b";
+                            }
                         }
                     }
                 }
                 catch (TimeoutException) { }
             }
+        }
+
+        private void btnSO_Click(object sender, EventArgs e)
+        {
+            OperationSystem = !OperationSystem;
         }
     }
 }

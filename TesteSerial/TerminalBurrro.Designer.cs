@@ -48,6 +48,7 @@
             btnEnviar = new Button();
             txtEnviar = new TextBox();
             timer1 = new System.Windows.Forms.Timer(components);
+            btnSO = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             SuspendLayout();
@@ -74,7 +75,7 @@
             // 
             // btnAbrirPorta
             // 
-            btnAbrirPorta.Location = new Point(147, 412);
+            btnAbrirPorta.Location = new Point(61, 418);
             btnAbrirPorta.Margin = new Padding(4, 5, 4, 5);
             btnAbrirPorta.Name = "btnAbrirPorta";
             btnAbrirPorta.Size = new Size(107, 38);
@@ -185,6 +186,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(btnSO);
             groupBox1.Controls.Add(cboBaud);
             groupBox1.Controls.Add(cboHandshake);
             groupBox1.Controls.Add(label1);
@@ -202,7 +204,7 @@
             groupBox1.Margin = new Padding(4, 5, 4, 5);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new Padding(4, 5, 4, 5);
-            groupBox1.Size = new Size(410, 466);
+            groupBox1.Size = new Size(410, 480);
             groupBox1.TabIndex = 13;
             groupBox1.TabStop = false;
             groupBox1.Text = "Configurações";
@@ -252,6 +254,17 @@
             txtEnviar.Size = new Size(574, 31);
             txtEnviar.TabIndex = 0;
             // 
+            // btnSO
+            // 
+            btnSO.Location = new Point(176, 418);
+            btnSO.Margin = new Padding(4, 5, 4, 5);
+            btnSO.Name = "btnSO";
+            btnSO.Size = new Size(155, 38);
+            btnSO.TabIndex = 14;
+            btnSO.Text = "Compartilhar SO";
+            btnSO.UseVisualStyleBackColor = true;
+            btnSO.Click += btnSO_Click;
+            // 
             // TerminalBurrro
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -292,6 +305,7 @@
         private Button btnEnviar;
         private TextBox txtEnviar;
         private System.Windows.Forms.Timer timer1;
+        private Button btnSO;
         //private Label label7;
     }
 }
