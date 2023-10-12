@@ -166,7 +166,9 @@ namespace TesteSerial
 
         public void Read()
         {
-            string receive; 
+            string receive;
+            string data;
+            int cont = 0;
 
             while (true)
             {
@@ -176,21 +178,37 @@ namespace TesteSerial
                     {
                         processoCmd.Start();
 
-                        _serialPort.Write("C > ");
+                        if (cont == 0)
+                        {
+                            _serialPort.Write("C > ");
+                            cont = 1;
+                        }
 
                         receive = _serialPort.ReadExisting();
 
                         if (receive != "" && receive != null)
                         {
+                            _serialPort.Write(receive);
+                            while (!receive.Contains("\r"))
+                            {
+                                data = _serialPort.ReadExisting();
+                                receive += data;
+                                _serialPort.Write(data);
+                            }
+
                             processoCmd.StandardInput.WriteLine(receive);
                             processoCmd.StandardInput.Flush();
                             processoCmd.StandardInput.Close();
                             processoCmd.WaitForExit();
 
+                            _serialPort.Write("C > ");
+
                             var saida = processoCmd.StandardOutput.ReadToEnd();
+                            
 
                             _serialPort.WriteLine(saida);
                             processoCmd.Close();
+                            //OperationSystem = false;
                             /*Console.Write("C > ");
                             cmd = Console.ReadLine();
                             if (cmd == "cls")
