@@ -195,32 +195,37 @@ namespace TesteSerial
                                 receive += data;
                                 _serialPort.Write(data);
                             }
+                            _serialPort.WriteLine("");
+                            if (!receive.Contains("cls") && !receive.Contains("clear"))
+                            {
+                                processoCmd.StandardInput.WriteLine(receive);
+                                processoCmd.StandardInput.Flush();
+                                processoCmd.StandardInput.Close();
+                                processoCmd.WaitForExit();
 
-                            processoCmd.StandardInput.WriteLine(receive);
-                            processoCmd.StandardInput.Flush();
-                            processoCmd.StandardInput.Close();
-                            processoCmd.WaitForExit();
+                                var output = processoCmd.StandardOutput.ReadToEnd();
+                                output = output.Replace(output.Substring(output.LastIndexOf(":") - 1, (output.Length - output.LastIndexOf(":") + 1)), "");
+                                output = output + "\n";
+                                output = output.Replace(output.Substring(0, (output.IndexOf(receive))), "");
+                                output = output.Replace(receive, "");
 
-                            _serialPort.Write("C > ");
-
-                            var saida = processoCmd.StandardOutput.ReadToEnd();
-                            
-
-                            _serialPort.WriteLine(saida);
+                                _serialPort.WriteLine(output);
+                            }
+                            else
+                            {
+                                for (int i = 0; i <=1920; i++)
+                                {
+                                    _serialPort.Write(" ");
+                                }
+                            }
                             processoCmd.Close();
-                            //OperationSystem = false;
-                            /*Console.Write("C > ");
-                            cmd = Console.ReadLine();
-                            if (cmd == "cls")
-                                Console.Clear();
-                            if (cmd == "exit")
-                                break; */
+                            _serialPort.Write("C > ");
                         }
                     }
                     else
                     {
                         receive = _serialPort.ReadExisting();
-
+                        
                         if (receive != "" && receive != null)
                         {
                             _serialPort.Write($"{receive}");
@@ -239,7 +244,9 @@ namespace TesteSerial
                         }
                     }
                 }
-                catch (TimeoutException) { }
+                catch (TimeoutException) 
+                { 
+                }
             }
         }
 
